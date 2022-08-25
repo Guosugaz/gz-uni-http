@@ -3,19 +3,9 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-08-24 16:19:25
+ * @LastEditTime: 2022-08-25 18:19:46
  */
-type A = Record<string, any>;
-interface RequsetOptions extends Omit<UniNamespace.RequestOptions, "url"> {
-  baseUrl?: string;
-  path?: string;
-  url?: string;
-}
-
-interface Interceptor {
-  request?: (req: RequsetOptions) => false | void;
-  response?: (res: UniNamespace.GeneralCallbackResult) => any;
-}
+import type { RequsetOptions, Interceptor } from "./types";
 
 export default class {
   config: RequsetOptions;
