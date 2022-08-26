@@ -3,9 +3,11 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-08-25 18:19:46
+ * @LastEditTime: 2022-08-26 18:00:04
  */
+import hook from "./hook";
 import type { RequsetOptions, Interceptor } from "./types";
+import { deepMerge } from "./utils";
 
 export default class {
   config: RequsetOptions;
@@ -32,6 +34,14 @@ export default class {
   }
 
   request(options = {} as RequsetOptions) {
+    if (this.config.baseUrl && this.config.path && !options.url) {
+      options.url = this.config.baseUrl + this.config.path;
+    }
+
+    options = deepMerge(this.config, options);
+
+    hook.triggerBrforeRquest(options);
+
     // 检查请求拦截
     if (
       this.interceptor.request &&
@@ -43,17 +53,10 @@ export default class {
         return new Promise(() => {});
       }
     }
-    options.dataType = options.dataType || this.config.dataType;
-    options.responseType = options.responseType || this.config.responseType;
-    options.header = Object.assign({}, this.config.header, options.header);
-    options.method = options.method || this.config.method;
-
-    if (this.config.baseUrl && this.config.path && !options.url) {
-      options.url = this.config.baseUrl + this.config.path;
-    }
-
     return new Promise((resolve, reject) => {
       options.complete = (response: UniNamespace.GeneralCallbackResult) => {
+        hook.triggerBeforeInterceptorResponse(response);
+
         // 判断是否存在拦截器
         if (
           this.interceptor.response &&
@@ -72,5 +75,13 @@ export default class {
       };
       uni.request(options as UniNamespace.RequestOptions);
     });
+  }
+
+  updateConfig(customConfig: RequsetOptions) {
+    this.config = deepMerge(this.config, customConfig);
+  }
+
+  addPlugin(install: (requset: this) => void) {
+    install(this);
   }
 }

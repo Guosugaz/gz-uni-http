@@ -3,14 +3,35 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:24:50
- * @LastEditTime: 2022-08-25 18:19:04
+ * @LastEditTime: 2022-08-26 15:10:09
  */
-class Hook {
-  private brforeRquest: Array<(config: any) => any> = [];
+import type {
+  RequsetOptions,
+  BreforeRquestCallback,
+  BeforeInterceptorResponseCallback
+} from "./types";
 
-  triggerBrforeRquest(config: any) {
-    this.brforeRquest.forEach((fn) => fn && fn(config));
+class Hook {
+  private brforeRquestList: Array<BreforeRquestCallback> = [];
+  private beforeInterceptorResponseList: Array<BeforeInterceptorResponseCallback> =
+    [];
+
+  brforeRquest(callback: BreforeRquestCallback) {
+    this.brforeRquestList.push(callback);
   }
+
+  beforeInterceptorResponse(callback: BeforeInterceptorResponseCallback) {
+    this.beforeInterceptorResponseList.push(callback);
+  }
+
+  triggerBrforeRquest(config: RequsetOptions) {
+    this.brforeRquestList.forEach((fn) => fn && fn(config));
+  }
+
+  triggerBeforeInterceptorResponse(res: UniNamespace.GeneralCallbackResult) {
+    this.beforeInterceptorResponseList.forEach((fn) => fn && fn(res));
+  }
+
 }
 
 export default new Hook();
