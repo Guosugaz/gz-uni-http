@@ -3,8 +3,9 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:28:00
- * @LastEditTime: 2022-08-26 17:26:29
+ * @LastEditTime: 2022-08-28 14:40:45
  */
+import type { RequsetOptions, Response } from "./types";
 
 export const isDef = <T = any>(value: T): value is NonNullable<T> => {
   return value !== undefined && value !== null;
@@ -98,4 +99,28 @@ export function deepMerge(target: any = {}, source: any = {}) {
     }
   }
   return target;
+}
+
+/**
+ * @description: 格式化返回请求
+ * @return {*}
+ */
+export function formatNetworkResponse<T>(
+  res: UniNamespace.RequestSuccessCallbackResult,
+  config: RequsetOptions
+): Response<T> {
+  const temp: Response = {
+    status: res.statusCode,
+    data: res.data,
+    header: res.header,
+    config,
+    errMsg: (res as any).errMsg
+  };
+  if (!temp.errMsg || temp.errMsg === "request:fail") {
+    temp.status = null;
+    temp.data = null
+    temp.header = null;
+  }
+
+  return temp;
 }

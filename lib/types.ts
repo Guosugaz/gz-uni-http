@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 18:19:10
- * @LastEditTime: 2022-08-26 17:39:35
+ * @LastEditTime: 2022-08-28 14:55:25
  */
 
 export type Methods =
@@ -32,6 +32,15 @@ export interface CacheOptions {
     paths?: string[];
   };
 }
+
+export type Response<T = any> = {
+  status: number | null;
+  data: T;
+  errMsg: "request:fail" | "request:ok";
+  header: any;
+  config: RequsetOptions;
+};
+
 export interface RequsetOptions {
   /**
    * 资源url
@@ -83,13 +92,16 @@ export interface RequsetOptions {
 
 export interface Interceptor {
   request?: (req: RequsetOptions) => false | void;
-  response?: (res: UniNamespace.GeneralCallbackResult) => any;
+  response?: (res: Response) => any;
 }
 
-export type BreforeRquestCallback = (config: RequsetOptions) => any;
+export type BreforeRquestCallback = (
+  config: RequsetOptions
+) => Promise<BreforeRquestCallbackRes>;
 
-export type BeforeInterceptorResponseCallback = (
-  res:
-    | UniNamespace.GeneralCallbackResult
-    | UniNamespace.RequestSuccessCallbackResult
-) => any;
+export type BreforeRquestCallbackRes = {
+  pass: boolean;
+  data?: any;
+};
+
+export type BeforeInterceptorResponseCallback = (res: Response) => any;

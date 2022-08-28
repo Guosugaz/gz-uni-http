@@ -3,12 +3,13 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:24:50
- * @LastEditTime: 2022-08-26 15:10:09
+ * @LastEditTime: 2022-08-27 21:33:48
  */
 import type {
   RequsetOptions,
   BreforeRquestCallback,
-  BeforeInterceptorResponseCallback
+  BeforeInterceptorResponseCallback,
+  Response
 } from "./types";
 
 class Hook {
@@ -24,14 +25,19 @@ class Hook {
     this.beforeInterceptorResponseList.push(callback);
   }
 
-  triggerBrforeRquest(config: RequsetOptions) {
-    this.brforeRquestList.forEach((fn) => fn && fn(config));
+  async triggerBrforeRquest(config: RequsetOptions): Promise<{
+    pass: boolean;
+    data?: any;
+  }> {
+    const list = this.brforeRquestList.map((fn) => fn && fn(config));
+    const res = await Promise.all(list);
+    const findItem = res.find((i) => i.pass);
+    return findItem || { pass: false };
   }
 
-  triggerBeforeInterceptorResponse(res: UniNamespace.GeneralCallbackResult) {
+  triggerBeforeInterceptorResponse(res: Response) {
     this.beforeInterceptorResponseList.forEach((fn) => fn && fn(res));
   }
-
 }
 
 export default new Hook();
