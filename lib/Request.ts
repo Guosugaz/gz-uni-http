@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-08-28 14:57:03
+ * @LastEditTime: 2022-08-29 18:13:35
  */
 import hook from "./hook";
 import type { RequsetOptions, Interceptor } from "./types";
@@ -44,6 +44,7 @@ export default class {
       hook.triggerBrforeRquest(options).then((beRes) => {
         if (beRes.pass) {
           resolve(beRes.data);
+          return;
         }
 
         // 检查请求拦截

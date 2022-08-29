@@ -9,8 +9,16 @@
   import { http } from "../../utils/request";
 
   const userList = () => {
-    http.xhr({
-      path: "/userList"
-    });
+    http
+      .xhr({
+        path: "/userList",
+        cache: {
+          maxAge: 10 * 1000
+        }
+      })
+      .then((res) => {
+        console.log(res);
+      });
   };
 </script>
+*

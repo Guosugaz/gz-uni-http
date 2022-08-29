@@ -3,20 +3,21 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:25:31
- * @LastEditTime: 2022-08-26 17:49:42
+ * @LastEditTime: 2022-08-29 15:37:51
  */
+import { CacheData } from "../../types";
 import { mapObject } from "../../utils";
 
 class MemoryStore {
   store: Record<string, string> = {};
 
-  getItem(key: string) {
+  getItem(key: string): CacheData {
     const item = this.store[key] || null;
 
     return item ? JSON.parse(item) : null;
   }
 
-  setItem(key: string, value: any) {
+  setItem(key: string, value: CacheData) {
     this.store[key] = JSON.stringify(value);
 
     return value;

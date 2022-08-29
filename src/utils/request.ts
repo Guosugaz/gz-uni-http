@@ -3,13 +3,16 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 16:16:59
- * @LastEditTime: 2022-08-28 11:30:37
+ * @LastEditTime: 2022-08-29 17:43:35
  */
 import Http from "../../lib/Request";
+import cachePlugin from "../../lib/plugins/cache";
 
 export const http = new Http({
   baseUrl: "http://localhost:6780"
 });
+
+http.addPlugin(cachePlugin());
 
 http.interceptor.request = (options) => {};
 

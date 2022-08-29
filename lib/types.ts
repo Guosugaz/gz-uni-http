@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 18:19:10
- * @LastEditTime: 2022-08-28 14:55:25
+ * @LastEditTime: 2022-08-29 17:39:38
  */
 
 export type Methods =
@@ -18,12 +18,12 @@ export type Methods =
 
 export interface CacheOptions {
   maxAge?: number;
-  limit?: boolean;
+  limit?: number;
   debug?: boolean;
   query?: boolean;
   key?: (config: RequsetOptions) => string | string; // 生成key
   invalidate?: (config: RequsetOptions) => boolean; // 验证规则
-  include: {
+  include?: {
     paths?: string[];
     maxAge: number;
     methods?: Methods[];
@@ -33,12 +33,18 @@ export interface CacheOptions {
   };
 }
 
+export type CacheData = {
+  expires: number;
+  data: any;
+};
+
 export type Response<T = any> = {
   status: number | null;
   data: T;
   errMsg: "request:fail" | "request:ok";
   header: any;
   config: RequsetOptions;
+  cache?: boolean;
 };
 
 export interface RequsetOptions {

@@ -3,9 +3,9 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:33:49
- * @LastEditTime: 2022-08-27 22:32:36
+ * @LastEditTime: 2022-08-29 18:04:57
  */
-import type { RequsetOptions, Methods } from "../../types";
+import type { RequsetOptions, Methods, Response, CacheData } from "../../types";
 import { isDef, isFunction, isString } from "../../utils";
 import store from "./memory-store";
 
@@ -18,37 +18,31 @@ export function read(config: RequsetOptions) {
   }
 
   const { expires, data } = entry;
-
   // 判断是否过期
-  if (expires !== 0 && expires < Date.now()) {
+  if (expires !== 0 && expires < +Date.now()) {
     const error = new Error();
     error.message = "Entry is expires";
     store.removeItem(config.cacheKey!);
     throw error;
   }
 
+  data.cache = true;
   return data;
 }
 
-export function write(res) {
+export function write(res: Response) {
   const { config } = res;
   try {
-    const entry = {
-      expires: config.expires,
-      data: res
+    const entry: CacheData = {
+      expires: +Date.now() + config.cache!.maxAge!,
+      data: { ...res }
     };
 
-    config.store.setItem(config.uuid, entry);
-  } catch (err) {
-    config.debug("Could not store response", err);
+    delete entry.data.config;
 
-    if (config.clearOnError) {
-      try {
-        config.store.clear();
-      } catch (err) {
-        config.debug("Could not clear store", err);
-      }
-    }
+    store.setItem(config.cacheKey!, entry);
+  } catch (err) {
+    store.clear();
 
     return false;
   }
@@ -107,4 +101,20 @@ export function invalidate(config = {} as RequsetOptions) {
     }
   }
   return res;
+}
+
+export async function limit(config: RequsetOptions) {
+  const length = store.length();
+  if (length < config.cache?.limit!) return;
+
+  let firstItem: any;
+
+  await store.iterate((value, key) => {
+    if (!firstItem) firstItem = { value, key };
+    if (value.expires < firstItem.value.expires) firstItem = { value, key };
+  });
+
+  if (firstItem) {
+    store.removeItem(firstItem.key);
+  }
 }
