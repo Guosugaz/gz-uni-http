@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:24:50
- * @LastEditTime: 2022-08-27 21:33:48
+ * @LastEditTime: 2022-08-30 17:05:28
  */
 import type {
   RequsetOptions,
@@ -16,6 +16,8 @@ class Hook {
   private brforeRquestList: Array<BreforeRquestCallback> = [];
   private beforeInterceptorResponseList: Array<BeforeInterceptorResponseCallback> =
     [];
+  private successResponseList: Array<BeforeInterceptorResponseCallback> = [];
+  private errorResponseList: Array<BeforeInterceptorResponseCallback> = [];
 
   brforeRquest(callback: BreforeRquestCallback) {
     this.brforeRquestList.push(callback);
@@ -23,6 +25,14 @@ class Hook {
 
   beforeInterceptorResponse(callback: BeforeInterceptorResponseCallback) {
     this.beforeInterceptorResponseList.push(callback);
+  }
+
+  successResponse(callback: BeforeInterceptorResponseCallback) {
+    this.successResponseList.push(callback);
+  }
+
+  errorResponse(callback: BeforeInterceptorResponseCallback) {
+    this.errorResponseList.push(callback);
   }
 
   async triggerBrforeRquest(config: RequsetOptions): Promise<{
@@ -37,6 +47,14 @@ class Hook {
 
   triggerBeforeInterceptorResponse(res: Response) {
     this.beforeInterceptorResponseList.forEach((fn) => fn && fn(res));
+  }
+
+  triggerSuccessResponse(res: Response) {
+    this.successResponseList.forEach((fn) => fn && fn(res));
+  }
+
+  triggerErrorResponse(res: Response) {
+    this.errorResponseList.forEach((fn) => fn && fn(res));
   }
 }
 

@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-08-30 11:38:39
+ * @LastEditTime: 2022-08-30 17:22:00
  */
 import hook from "./hook";
 import type { RequsetOptions, Interceptor } from "./types";
@@ -11,12 +11,28 @@ import { deepMerge, formatNetworkResponse } from "./utils";
 
 export default class {
   config: RequsetOptions;
+
+  private requestInterceptor: Interceptor.RequestCallback | undefined;
+  private responseSuccessInterceptor:
+    | Interceptor.ResponseSuccessCallback
+    | undefined;
+  private responseErrorInterceptor:
+    | Interceptor.ResponseErrorCallback
+    | undefined;
+
   // 拦截器
-  interceptor: Interceptor = {
+  interceptor: Interceptor.InterceptorType = {
     // 请求前的拦截
-    request: undefined,
+    request: (callback) => {
+      this.requestInterceptor = callback;
+    },
     // 请求后的拦截
-    response: undefined
+    response: (success, errror) => {
+      this.responseSuccessInterceptor = success;
+      if (errror) {
+        this.responseErrorInterceptor = errror;
+      }
+    }
   };
 
   constructor(customConfig = {} as RequsetOptions) {
@@ -41,42 +57,60 @@ export default class {
 
       options = deepMerge(this.config, options);
 
+      // 请求前hook
       hook.triggerBrforeRquest(options).then((beRes) => {
+        // 判断是否要跳过当前请求
         if (beRes.pass) {
-          resolve(beRes.data);
+          let data = beRes.data;
+          if (this.responseSuccessInterceptor) {
+            data = this.responseSuccessInterceptor(data);
+          }
+          resolve(data);
           return;
         }
 
-        // 检查请求拦截
-        if (
-          this.interceptor.request &&
-          typeof this.interceptor.request === "function"
-        ) {
-          let interceptorRequest = this.interceptor.request(options);
-          if (interceptorRequest === false) {
-            // 返回一个处于pending状态中的Promise，来取消原promise，避免进入then()回调
-            return new Promise(() => {});
+        if (this.requestInterceptor) {
+          try {
+            options = this.requestInterceptor(options);
+          } catch (error) {
+            return reject(error);
           }
         }
 
+        // 请求完成回调
         options.complete = (res: any) => {
-          const response = formatNetworkResponse<T>(res, options);
+          let response = formatNetworkResponse<T>(res, options);
           hook.triggerBeforeInterceptorResponse(response);
 
-          // 判断是否存在拦截器
+          // 请求成功
           if (
-            this.interceptor.response &&
-            typeof this.interceptor.response === "function"
+            response.errMsg === "request:ok" &&
+            String(response.status).startsWith("2")
           ) {
-            try {
-              let resInterceptors = this.interceptor.response(response);
-              resolve(resInterceptors);
-            } catch (error) {
-              reject(error);
+            // 返回结果拦截
+            if (this.responseSuccessInterceptor) {
+              try {
+                hook.triggerSuccessResponse(response);
+                response = this.responseSuccessInterceptor(response);
+                resolve(response as any);
+              } catch (error) {
+                hook.triggerErrorResponse(response);
+                return reject(error);
+              }
+            } else {
+              hook.triggerSuccessResponse(response);
+
+              resolve(response.data);
             }
           } else {
-            // 如果要求返回原始数据，就算没有拦截器，也返回最原始的数据
-            resolve(response.data);
+            // 请求失败
+            hook.triggerErrorResponse(response);
+            if (this.responseErrorInterceptor) {
+              const res = this.responseErrorInterceptor(response);
+              reject(res);
+            } else {
+              reject(response);
+            }
           }
         };
         uni.request(options as UniNamespace.RequestOptions);

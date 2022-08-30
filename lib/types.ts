@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 18:19:10
- * @LastEditTime: 2022-08-29 17:39:38
+ * @LastEditTime: 2022-08-30 15:58:27
  */
 
 export type Methods =
@@ -96,9 +96,24 @@ export interface RequsetOptions {
   complete?: (result: UniNamespace.GeneralCallbackResult) => void;
 }
 
-export interface Interceptor {
-  request?: (req: RequsetOptions) => false | void;
-  response?: (res: Response) => any;
+export declare namespace Interceptor {
+  type RequestCallback = (req: RequsetOptions) => RequsetOptions;
+
+  type RequestInterceptor = (callback: RequestCallback) => void;
+
+  type ResponseSuccessCallback = (res: Response) => any;
+  type ResponseErrorCallback = (res: Response) => any;
+
+  type ResponseInterceptor = (
+    success: ResponseSuccessCallback,
+    error?: ResponseErrorCallback
+  ) => void;
+
+  interface InterceptorType {
+    request: RequestInterceptor;
+    // 请求后的拦截
+    response: ResponseInterceptor;
+  }
 }
 
 export type BreforeRquestCallback = (

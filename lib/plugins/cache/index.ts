@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-26 15:14:20
- * @LastEditTime: 2022-08-30 13:06:05
+ * @LastEditTime: 2022-08-30 17:08:13
  */
 import Request from "../../Request";
 import hook from "../../hook";
@@ -55,26 +55,29 @@ export default function install(options = {} as CacheOptions) {
       return cacheData ? { pass: isCache, data: cacheData } : { pass: false };
     });
 
-    hook.beforeInterceptorResponse((res) => {
+    hook.successResponse((res) => {
       let pass = !res.config.cacheKey; // 判断是否要缓存
 
-      if (res.status === 200) {
-        const responseType = res.config.responseType || "";
-        // 跳过数据流
-        pass = ["arraybuffer", "blob"].some((i) => i === responseType);
+      const responseType = res.config.responseType || "";
+      // 跳过数据流
+      pass = ["arraybuffer", "blob"].some((i) => i === responseType);
 
-        if (res.config.cacheKey && !pass) {
-          if (res.config.cache?.limit) {
-            limit(res.config);
-          }
+      if (res.config.cacheKey && !pass) {
+        if (res.config.cache?.limit) {
+          limit(res.config);
+        }
 
-          write(res);
+        write(res);
+      }
+    });
+
+    hook.errorResponse((res) => {
+      let pass = !res.config.cacheKey; // 判断是否要缓存
+      if (!pass) {
+        if (res.config.cache?.debug) {
+          debug("request-error-remove", res.config.cacheKey);
         }
-      } else {
-        // 报错时删除对应的缓存
-        if (!pass) {
-          store.removeItem(res.config.cacheKey!);
-        }
+        store.removeItem(res.config.cacheKey!);
       }
     });
   };
