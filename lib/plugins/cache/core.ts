@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:33:49
- * @LastEditTime: 2022-08-29 18:04:57
+ * @LastEditTime: 2022-08-30 13:43:01
  */
 import type { RequsetOptions, Methods, Response, CacheData } from "../../types";
 import { isDef, isFunction, isString } from "../../utils";
@@ -12,6 +12,7 @@ import store from "./memory-store";
 export function read(config: RequsetOptions) {
   let entry = store.getItem(config.cacheKey!);
   if (!entry || !entry.data) {
+    debug("cache-miss", config.url);
     const error = new Error();
     error.message = "Entry not found from cache";
     throw error;
@@ -21,9 +22,14 @@ export function read(config: RequsetOptions) {
   // 判断是否过期
   if (expires !== 0 && expires < +Date.now()) {
     const error = new Error();
+    debug("cache-expires", config.url);
     error.message = "Entry is expires";
     store.removeItem(config.cacheKey!);
     throw error;
+  }
+
+  if (config.cache?.debug) {
+    debug("cache-hit", config.url);
   }
 
   data.cache = true;
@@ -42,6 +48,7 @@ export function write(res: Response) {
 
     store.setItem(config.cacheKey!, entry);
   } catch (err) {
+    debug("Could not store response", err);
     store.clear();
 
     return false;
@@ -106,6 +113,11 @@ export function invalidate(config = {} as RequsetOptions) {
 export async function limit(config: RequsetOptions) {
   const length = store.length();
   if (length < config.cache?.limit!) return;
+  const isDebug = config.cache?.debug;
+
+  if (isDebug) {
+    debug(`Current store size: ${length}`);
+  }
 
   let firstItem: any;
 
@@ -115,6 +127,11 @@ export async function limit(config: RequsetOptions) {
   });
 
   if (firstItem) {
+    debug(`Removing item: ${firstItem.key}`);
     store.removeItem(firstItem.key);
   }
+}
+
+export function debug(...msg: any[]) {
+  console.log("%c gz-http-cacha-debug: ", "background: #ff0099;color: #fff;", ...msg);
 }

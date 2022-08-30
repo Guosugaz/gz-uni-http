@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-26 15:14:20
- * @LastEditTime: 2022-08-29 17:55:49
+ * @LastEditTime: 2022-08-30 13:06:05
  */
 import Request from "../../Request";
 import hook from "../../hook";
@@ -11,13 +11,14 @@ import { defaultConfig } from "./config";
 import type { CacheData, CacheOptions } from "../../types";
 import { deepMerge } from "../../utils";
 import store from "./memory-store";
-import { createKey, invalidate, limit, read, write } from "./core";
+import { createKey, debug, invalidate, limit, read, write } from "./core";
 
 export default function install(options = {} as CacheOptions) {
   return function (requset: Request) {
     requset.updateConfig({
       cache: deepMerge(defaultConfig, options)
     });
+    debug("cache-config", requset.config.cache);
 
     // 请求之前
     hook.brforeRquest(async (config) => {
@@ -47,7 +48,7 @@ export default function install(options = {} as CacheOptions) {
         cacheData = read(config);
       } catch (error) {
         if ((error as any).message === "Entry is expires") {
-          delete config.cacheKey;
+          store.removeItem(config.cacheKey);
         }
       }
 
