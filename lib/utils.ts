@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:28:00
- * @LastEditTime: 2022-08-28 14:40:45
+ * @LastEditTime: 2022-08-31 17:31:27
  */
 import type { RequsetOptions, Response } from "./types";
 
@@ -116,9 +116,9 @@ export function formatNetworkResponse<T>(
     config,
     errMsg: (res as any).errMsg
   };
-  if (!temp.errMsg || temp.errMsg === "request:fail") {
+  if (!temp.errMsg || new RegExp("request:fail").test(temp.errMsg)) {
     temp.status = null;
-    temp.data = null
+    temp.data = null;
     temp.header = null;
   }
 

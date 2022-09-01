@@ -3,11 +3,12 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-08-30 17:22:00
+ * @LastEditTime: 2022-08-31 16:21:57
  */
 import hook from "./hook";
 import type { RequsetOptions, Interceptor } from "./types";
 import { deepMerge, formatNetworkResponse } from "./utils";
+import CancelToken from "./CancelToken";
 
 export default class {
   config: RequsetOptions;
@@ -19,6 +20,8 @@ export default class {
   private responseErrorInterceptor:
     | Interceptor.ResponseErrorCallback
     | undefined;
+
+  static CancelToken = CancelToken;
 
   // 拦截器
   interceptor: Interceptor.InterceptorType = {
@@ -53,6 +56,12 @@ export default class {
     return new Promise((resolve, reject) => {
       if (this.config.baseUrl && options.path && !options.url) {
         options.url = this.config.baseUrl + options.path;
+      }
+
+      let cancelToken: CancelToken;
+      let unSubscribeCancel: () => void;
+      if (options.cancelToken) {
+        cancelToken = options.cancelToken;
       }
 
       options = deepMerge(this.config, options);
@@ -112,8 +121,17 @@ export default class {
               reject(response);
             }
           }
+
+          unSubscribeCancel && unSubscribeCancel();
         };
-        uni.request(options as UniNamespace.RequestOptions);
+        const task = uni.request(options as UniNamespace.RequestOptions);
+
+        if (cancelToken) {
+          cancelToken.subscribe(task);
+          unSubscribeCancel = () => {
+            cancelToken.unSubscribe(task);
+          };
+        }
       });
     });
   }

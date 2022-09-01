@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-26 15:14:20
- * @LastEditTime: 2022-08-30 17:08:13
+ * @LastEditTime: 2022-09-01 14:12:46
  */
 import Request from "../../Request";
 import hook from "../../hook";
@@ -67,7 +67,7 @@ export default function install(options = {} as CacheOptions) {
           limit(res.config);
         }
 
-        write(res);
+        res.cache = write(res);
       }
     });
 

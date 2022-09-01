@@ -3,8 +3,10 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 18:19:10
- * @LastEditTime: 2022-08-30 15:58:27
+ * @LastEditTime: 2022-08-31 16:01:01
  */
+
+import type CancelToken from "./CancelToken";
 
 export type Methods =
   | "OPTIONS"
@@ -41,7 +43,7 @@ export type CacheData = {
 export type Response<T = any> = {
   status: number | null;
   data: T;
-  errMsg: "request:fail" | "request:ok";
+  errMsg: string;
   header: any;
   config: RequsetOptions;
   cache?: boolean;
@@ -91,6 +93,7 @@ export interface RequsetOptions {
    * DNS解析时优先使用 ipv4
    */
   firstIpv4?: boolean;
+  cancelToken?: CancelToken;
   cache?: CacheOptions; // 缓存配置
   cacheKey?: string;
   complete?: (result: UniNamespace.GeneralCallbackResult) => void;
