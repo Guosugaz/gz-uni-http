@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:28:00
- * @LastEditTime: 2022-08-31 17:31:27
+ * @LastEditTime: 2022-09-01 17:52:09
  */
 import type { RequsetOptions, Response } from "./types";
 
@@ -105,7 +105,7 @@ export function deepMerge(target: any = {}, source: any = {}) {
  * @description: 格式化返回请求
  * @return {*}
  */
-export function formatNetworkResponse<T>(
+export function formatNetworkResponse<T = any>(
   res: UniNamespace.RequestSuccessCallbackResult,
   config: RequsetOptions
 ): Response<T> {

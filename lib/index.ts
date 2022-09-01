@@ -3,6 +3,8 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:37:20
- * @LastEditTime: 2022-08-29 16:20:59
+ * @LastEditTime: 2022-09-01 16:46:45
  */
-export * from "./Request";
+import Http from "./Request";
+
+export default Http;

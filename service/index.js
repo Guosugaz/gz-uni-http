@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:21:00
- * @LastEditTime: 2022-08-30 17:12:09
+ * @LastEditTime: 2022-09-01 16:39:50
  */
 const { userList, goodsList } = require("./mock.js");
 const express = require("express");
@@ -24,11 +24,21 @@ app.get("/userList", (req, res) => {
   // }, 2000);
 });
 
-app.get("/userList", (req, res) => {
+app.get("/goodsList", (req, res) => {
   // res.sendStatus(500);
   res.send({
     code: 200,
     data: goodsList().list
+  });
+});
+
+app.get("/error", (req, res) => {
+  res.sendStatus(500);
+  res.send({
+    code: 500,
+    data: {
+      msg: "error"
+    }
   });
 });
 

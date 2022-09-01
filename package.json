@@ -6,7 +6,9 @@
     "dev:mp-weixin": "uni -p mp-weixin",
     "build:h5": "uni build",
     "build:mp-weixin": "uni build -p mp-weixin",
-    "service": "nodemon ./service/index.js"
+    "service": "nodemon ./service/index.js",
+    "lib:dev": "tsc -p lib --outDir dist -d -m esnext -w",
+    "lib:build": "gulp clean && tsc -p lib --outDir dist -d -m esnext && gulp terser"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-alpha-3040820220424001",
@@ -21,10 +23,14 @@
     "@dcloudio/uni-mp-toutiao": "3.0.0-alpha-3040820220424001",
     "@dcloudio/uni-mp-weixin": "3.0.0-alpha-3040820220424001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-alpha-3040820220424001",
-    "better-mock": "^0.3.6",
+    "better-mock": "0.3.6",
     "cors": "^2.8.5",
-    "express": "^4.18.1",
-    "nodemon": "^2.0.19",
+    "express": "4.18.1",
+    "gulp": "4.0.2",
+    "gulp-clean": "0.4.0",
+    "gulp-terser": "2.1.0",
+    "nodemon": "2.0.19",
+    "tslib": "^2.4.0",
     "vue": "^3.2.37",
     "vue-i18n": "^9.1.9",
     "vuex": "^4.0.2"

@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:21:05
- * @LastEditTime: 2022-08-28 11:12:04
+ * @LastEditTime: 2022-09-01 10:25:13
  */
 const Mock = require("better-mock");
 
@@ -24,7 +24,7 @@ module.exports = {
         {
           "id|+1": 1,
           name: Mock.Random.title(),
-          price: Random.float(0.01, 99999, 0, 2)
+          price: Mock.Random.float(0.01, 99999, 0, 2)
         }
       ]
     });

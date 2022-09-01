@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-08-31 16:21:57
+ * @LastEditTime: 2022-09-01 17:51:43
  */
 import hook from "./hook";
 import type { RequsetOptions, Interceptor } from "./types";
@@ -52,7 +52,7 @@ export default class {
     };
   }
 
-  xhr<T = any>(options = {} as RequsetOptions): Promise<T> {
+  xhr(options = {} as RequsetOptions) {
     return new Promise((resolve, reject) => {
       if (this.config.baseUrl && options.path && !options.url) {
         options.url = this.config.baseUrl + options.path;
@@ -82,13 +82,23 @@ export default class {
           try {
             options = this.requestInterceptor(options);
           } catch (error) {
-            return reject(error);
+            return reject(
+              formatNetworkResponse(
+                {
+                  statusCode: null,
+                  data: error,
+                  header: options.header,
+                  errMsg: "request:fail requestInterceptor error"
+                } as unknown as UniNamespace.RequestSuccessCallbackResult,
+                options
+              )
+            );
           }
         }
 
         // 请求完成回调
         options.complete = (res: any) => {
-          let response = formatNetworkResponse<T>(res, options);
+          let response = formatNetworkResponse(res, options);
           hook.triggerBeforeInterceptorResponse(response);
 
           // 请求成功
@@ -109,7 +119,7 @@ export default class {
             } else {
               hook.triggerSuccessResponse(response);
 
-              resolve(response.data);
+              resolve(response);
             }
           } else {
             // 请求失败
