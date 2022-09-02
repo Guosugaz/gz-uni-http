@@ -3,6 +3,7 @@
     <button @click="userList">userList</button>
     <button @click="goodsList">goodsList</button>
     <button @click="error">error</button>
+    <button @click="file">file</button>
   </view>
 </template>
 
@@ -36,6 +37,22 @@
       });
     } catch (error) {
       console.log("------", error);
+    }
+  };
+
+  const file = async () => {
+    try {
+      // const res = await http.download({
+      //   path: "/file/table.xlsx"
+      // });
+      // console.log(66666666, res);
+      // const link = document.createElement("a");
+      // link.href = window.URL.createObjectURL(res);
+      // link.download = "111.xlsx";
+      // link.click();
+      // window.URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.log("2222222", error);
     }
   };
 </script>

@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 16:16:59
- * @LastEditTime: 2022-09-01 17:05:04
+ * @LastEditTime: 2022-09-02 18:09:39
  */
 import Http from "../../lib/Request";
 import cachePlugin from "../../lib/plugins/cache";
@@ -27,7 +27,9 @@ http.interceptor.request((config) => {
 http.interceptor.response(
   (res) => {
     // throw { aaa: 1 };
-    console.log(res);
+    if (["arraybuffer", "blob"].some((i) => res.config.responseType === i)) {
+      return res.data;
+    }
     return res.data.data;
   },
   (err) => {

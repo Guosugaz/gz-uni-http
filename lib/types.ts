@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 18:19:10
- * @LastEditTime: 2022-08-31 16:01:01
+ * @LastEditTime: 2022-09-02 10:59:36
  */
 
 import type CancelToken from "./CancelToken";
@@ -49,6 +49,7 @@ export type Response<T = any> = {
   cache?: boolean;
 };
 
+// @see https://uniapp.dcloud.net.cn/api/request/request.html
 export interface RequsetOptions {
   /**
    * 资源url
@@ -56,6 +57,7 @@ export interface RequsetOptions {
   url?: string;
   baseUrl?: string;
   path?: string;
+  requestType?: "xhr" | "download" | "upload"; // 请求类型
   /**
    * 请求的参数
    */
@@ -80,7 +82,7 @@ export interface RequsetOptions {
   /**
    * 设置响应的数据类型。合法值：text、arraybuffer
    */
-  responseType?: string;
+  responseType?: "text" | "arraybuffer";
   /**
    * 验证 ssl 证书
    */
