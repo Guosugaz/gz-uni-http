@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 18:19:10
- * @LastEditTime: 2022-09-02 10:59:36
+ * @LastEditTime: 2022-09-03 10:13:19
  */
 
 import type CancelToken from "./CancelToken";
@@ -57,7 +57,7 @@ export interface RequsetOptions {
   url?: string;
   baseUrl?: string;
   path?: string;
-  requestType?: "xhr" | "download" | "upload"; // 请求类型
+  requestType?: "request" | "downloadFile" | "uploadFile"; // 请求类型 默认是request
   /**
    * 请求的参数
    */

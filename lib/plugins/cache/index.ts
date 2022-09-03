@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-26 15:14:20
- * @LastEditTime: 2022-09-01 14:12:46
+ * @LastEditTime: 2022-09-03 10:19:42
  */
 import Request from "../../Request";
 import hook from "../../hook";
@@ -22,6 +22,10 @@ export default function install(options = {} as CacheOptions) {
 
     // 请求之前
     hook.brforeRquest(async (config) => {
+      // 跳过非普通请求或者数据流
+      if (config.requestType !== "request" || config.responseType === "arraybuffer") {
+        return { pass: false }
+      }
       let isCache = false;
       const cache = config.cache!;
       // 判断能否缓存
@@ -56,15 +60,21 @@ export default function install(options = {} as CacheOptions) {
     });
 
     hook.successResponse((res) => {
-      let pass = !res.config.cacheKey; // 判断是否要缓存
+      const { config } = res
+      let pass = !config.cacheKey; // 判断是否要缓存
 
-      const responseType = res.config.responseType || "";
-      // 跳过数据流
-      pass = ["arraybuffer", "blob"].some((i) => i === responseType);
+      const responseType = config.responseType || "";
 
-      if (res.config.cacheKey && !pass) {
-        if (res.config.cache?.limit) {
-          limit(res.config);
+      if (config.requestType !== "request") {
+        pass = false;
+      } else {
+        // 跳过数据流
+        pass = ["arraybuffer", "blob"].some((i) => i === responseType);
+      }
+
+      if (config.cacheKey && !pass) {
+        if (config.cache?.limit) {
+          limit(config);
         }
 
         res.cache = write(res);
@@ -72,12 +82,14 @@ export default function install(options = {} as CacheOptions) {
     });
 
     hook.errorResponse((res) => {
-      let pass = !res.config.cacheKey; // 判断是否要缓存
+      const { config } = res
+      let pass = !config.cacheKey; // 判断是否要缓存
+
       if (!pass) {
-        if (res.config.cache?.debug) {
-          debug("request-error-remove", res.config.cacheKey);
+        if (config.cache?.debug) {
+          debug("request-error-remove", config.cacheKey);
         }
-        store.removeItem(res.config.cacheKey!);
+        store.removeItem(config.cacheKey!);
       }
     });
   };

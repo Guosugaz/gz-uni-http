@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-09-01 17:51:43
+ * @LastEditTime: 2022-09-03 10:30:49
  */
 import hook from "./hook";
 import type { RequsetOptions, Interceptor } from "./types";
@@ -48,6 +48,7 @@ export default class {
       dataType: "json",
       // 此参数无需处理，因为5+和支付宝小程序不支持，默认为text即可
       responseType: "text",
+      requestType: "request",
       ...customConfig
     };
   }
@@ -134,7 +135,7 @@ export default class {
 
           unSubscribeCancel && unSubscribeCancel();
         };
-        const task = uni.request(options as UniNamespace.RequestOptions);
+        const task = uni[options.requestType!](options as any);
 
         if (cancelToken) {
           cancelToken.subscribe(task);
@@ -144,6 +145,16 @@ export default class {
         }
       });
     });
+  }
+
+  download(options: RequsetOptions): Promise<any> {
+    options.requestType = "downloadFile"
+    return this.xhr(options)
+  }
+
+  upload(options: RequsetOptions): Promise<any> {
+    options.requestType = "uploadFile"
+    return this.xhr(options)
   }
 
   updateConfig(customConfig: RequsetOptions) {

@@ -8,51 +8,58 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from "vue";
-  import { http } from "../../utils/request";
-  import Http from "../../../lib/Request";
-  const token = new Http.CancelToken();
+import { ref } from "vue";
+import { http } from "../../utils/request";
+import Http from "../../../lib/Request";
+const token = new Http.CancelToken();
 
-  const userList = async () => {
+const userList = async () => {
+  await http.xhr({
+    path: "/userList",
+    cancelToken: token,
+    cache: {
+      maxAge: 20 * 1000,
+    },
+  });
+};
+
+const goodsList = async () => {
+  await http.xhr({
+    path: "/goodsList",
+    cancelToken: token,
+  });
+};
+
+const error = async () => {
+  try {
     await http.xhr({
-      path: "/userList",
-      cancelToken: token,
-      cache: {
-        maxAge: 20 * 1000
-      }
+      url: "http://localhost:7777/error",
     });
-  };
+  } catch (error) {
+    console.log("------", error);
+  }
+};
 
-  const goodsList = async () => {
-    await http.xhr({
-      path: "/goodsList",
-      cancelToken: token
+const file = async () => {
+  try {
+    const res = await http.download({
+      path: "/file/table.xlsx",
     });
-  };
-
-  const error = async () => {
-    try {
-      await http.xhr({
-        url: "http://localhost:7777/error"
-      });
-    } catch (error) {
-      console.log("------", error);
-    }
-  };
-
-  const file = async () => {
-    try {
-      // const res = await http.download({
-      //   path: "/file/table.xlsx"
-      // });
-      // console.log(66666666, res);
-      // const link = document.createElement("a");
-      // link.href = window.URL.createObjectURL(res);
-      // link.download = "111.xlsx";
-      // link.click();
-      // window.URL.revokeObjectURL(link.href);
-    } catch (error) {
-      console.log("2222222", error);
-    }
-  };
+    console.log(66666666, res);
+    /* #ifdef H5 */
+    let blob = new Blob([res]);
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(res);
+    link.download = "111.xlsx";
+    link.click();
+    window.URL.revokeObjectURL(link.href);
+    /* #endif */
+    /* #ifdef MP-WEIXIN */
+    const fs = uni.getFileSystemManager();
+    fs.writeFileSync(`${wx.env.USER_DATA_PATH}/table.xlsx`, res, "utf8");
+    /* #endif */
+  } catch (error) {
+    console.log("2222222", error);
+  }
+};
 </script>
