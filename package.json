@@ -1,15 +1,21 @@
 {
   "name": "@sugaz/uni-http",
   "version": "0.0.1",
+  "main": "packages/index.js",
+  "types": "packages/index.d.ts",
   "scripts": {
     "dev:h5": "uni",
     "dev:mp-weixin": "uni -p mp-weixin",
     "build:h5": "uni build",
     "build:mp-weixin": "uni build -p mp-weixin",
     "service": "nodemon ./service/index.js",
-    "lib:dev": "tsc -p lib --outDir dist -d -m esnext -w",
-    "lib:build": "gulp clean && tsc -p lib --outDir dist -d -m esnext && gulp terser"
+    "lib:dev": "tsc -p lib --outDir packages -d -m esnext -w",
+    "lib:build": "gulp clean && tsc -p lib --outDir packages -d -m esnext && gulp terser"
   },
+  "files": [
+    "lib",
+    "packages"
+  ],
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-alpha-3040820220424001",
     "@dcloudio/uni-app-plus": "3.0.0-alpha-3040820220424001",
@@ -29,6 +35,7 @@
     "gulp": "4.0.2",
     "gulp-clean": "0.4.0",
     "gulp-terser": "2.1.0",
+    "miniprogram-api-typings": "^3.5.0",
     "nodemon": "2.0.19",
     "tslib": "^2.4.0",
     "vue": "^3.2.37",

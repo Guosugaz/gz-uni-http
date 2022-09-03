@@ -15,8 +15,15 @@
       "dom"
     ],
     "types": [
-      "@dcloudio/types"
-    ]
+      "@dcloudio/types",
+      "miniprogram-api-typings"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@": [
+        "src"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts",

@@ -3,12 +3,20 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 18:19:10
- * @LastEditTime: 2022-09-03 10:13:19
+ * @LastEditTime: 2022-09-03 21:48:51
  */
 
 import type CancelToken from "./CancelToken";
 
 export type Methods =
+  | "options"
+  | "get"
+  | "head"
+  | "post"
+  | "put"
+  | "delete"
+  | "trace"
+  | "connect"
   | "OPTIONS"
   | "GET"
   | "HEAD"
@@ -95,6 +103,35 @@ export interface RequsetOptions {
    * DNS解析时优先使用 ipv4
    */
   firstIpv4?: boolean;
+  // -------------------------start upload options---------------------------------
+  /**
+   * 文件类型，image/video/audio，仅支付宝小程序，且必填。
+   * - image: 图像
+   * - video: 视频
+   * - audio: 音频
+   */
+  fileType?: "image" | "video" | "audio";
+  /**
+   * 要上传的文件对象
+   */
+  file?: File;
+  /**
+   * 要上传文件资源的路径
+   */
+  filePath?: string;
+  /**
+   * 文件对应的 key , 开发者在服务器端通过这个 key 可以获取到文件二进制内容
+   */
+  name?: string;
+  /**
+   * 需要上传的文件列表。
+   */
+  files?: UniNamespace.UploadFileOptionFiles[];
+  /**
+   * HTTP 请求中其他额外的 form data
+   */
+  formData?: any;
+  // -------------------------end upload options---------------------------------
   cancelToken?: CancelToken;
   cache?: CacheOptions; // 缓存配置
   cacheKey?: string;

@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:28:00
- * @LastEditTime: 2022-09-01 17:52:09
+ * @LastEditTime: 2022-09-03 21:34:47
  */
 import type { RequsetOptions, Response } from "./types";
 
@@ -106,20 +106,34 @@ export function deepMerge(target: any = {}, source: any = {}) {
  * @return {*}
  */
 export function formatNetworkResponse<T = any>(
-  res: UniNamespace.RequestSuccessCallbackResult,
+  res:
+    | UniNamespace.RequestSuccessCallbackResult
+    | UniNamespace.DownloadSuccessData,
   config: RequsetOptions
 ): Response<T> {
+  let data, header;
+  if (config.requestType === "downloadFile") {
+    res = res as UniNamespace.DownloadSuccessData;
+    data = res.tempFilePath;
+  } else {
+    res = res as UniNamespace.RequestSuccessCallbackResult;
+    data = res.data;
+    header = res.header;
+  }
   const temp: Response = {
     status: res.statusCode,
-    data: res.data,
-    header: res.header,
+    data: data,
+    header: header || {},
     config,
     errMsg: (res as any).errMsg
   };
-  if (!temp.errMsg || new RegExp("request:fail").test(temp.errMsg)) {
+  if (
+    !temp.errMsg ||
+    new RegExp(`${config.requestType}:fail`).test(temp.errMsg)
+  ) {
     temp.status = null;
     temp.data = null;
-    temp.header = null;
+    temp.header = {};
   }
 
   return temp;

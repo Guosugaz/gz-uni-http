@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-24 14:38:25
- * @LastEditTime: 2022-09-03 10:30:49
+ * @LastEditTime: 2022-09-03 21:42:40
  */
 import hook from "./hook";
 import type { RequsetOptions, Interceptor } from "./types";
@@ -53,7 +53,7 @@ export default class {
     };
   }
 
-  xhr(options = {} as RequsetOptions) {
+  xhr(options = {} as RequsetOptions): Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.config.baseUrl && options.path && !options.url) {
         options.url = this.config.baseUrl + options.path;
@@ -104,7 +104,7 @@ export default class {
 
           // 请求成功
           if (
-            response.errMsg === "request:ok" &&
+            new RegExp(`${options.requestType}:ok`) &&
             String(response.status).startsWith("2")
           ) {
             // 返回结果拦截
@@ -148,13 +148,13 @@ export default class {
   }
 
   download(options: RequsetOptions): Promise<any> {
-    options.requestType = "downloadFile"
-    return this.xhr(options)
+    options.requestType = "downloadFile";
+    return this.xhr(options);
   }
 
   upload(options: RequsetOptions): Promise<any> {
-    options.requestType = "uploadFile"
-    return this.xhr(options)
+    options.requestType = "uploadFile";
+    return this.xhr(options);
   }
 
   updateConfig(customConfig: RequsetOptions) {

@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-26 15:14:20
- * @LastEditTime: 2022-09-03 10:19:42
+ * @LastEditTime: 2022-09-03 19:58:43
  */
 import Request from "../../Request";
 import hook from "../../hook";
@@ -23,8 +23,11 @@ export default function install(options = {} as CacheOptions) {
     // 请求之前
     hook.brforeRquest(async (config) => {
       // 跳过非普通请求或者数据流
-      if (config.requestType !== "request" || config.responseType === "arraybuffer") {
-        return { pass: false }
+      if (
+        config.requestType !== "request" ||
+        config.responseType === "arraybuffer"
+      ) {
+        return { pass: false };
       }
       let isCache = false;
       const cache = config.cache!;
@@ -46,10 +49,11 @@ export default function install(options = {} as CacheOptions) {
         cache.maxAge = cache.include.maxAge;
       }
 
-      let cacheData = null as unknown as CacheData;
+      let cacheData: any
 
       try {
         cacheData = read(config);
+        cacheData.config = config;
       } catch (error) {
         if ((error as any).message === "Entry is expires") {
           store.removeItem(config.cacheKey);
@@ -60,7 +64,7 @@ export default function install(options = {} as CacheOptions) {
     });
 
     hook.successResponse((res) => {
-      const { config } = res
+      const { config } = res;
       let pass = !config.cacheKey; // 判断是否要缓存
 
       const responseType = config.responseType || "";
@@ -82,7 +86,7 @@ export default function install(options = {} as CacheOptions) {
     });
 
     hook.errorResponse((res) => {
-      const { config } = res
+      const { config } = res;
       let pass = !config.cacheKey; // 判断是否要缓存
 
       if (!pass) {

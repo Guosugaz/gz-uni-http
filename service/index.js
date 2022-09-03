@@ -3,7 +3,7 @@
  * @Author: Guosugaz
  * @LastEditors: Guosugaz
  * @Date: 2022-08-25 17:21:00
- * @LastEditTime: 2022-09-02 09:50:07
+ * @LastEditTime: 2022-09-03 21:59:19
  */
 const { userList, goodsList } = require("./mock.js");
 const express = require("express");
@@ -14,6 +14,8 @@ const app = express();
 const port = 6780;
 
 app.use(cors());
+app.use(express.json()) // for parsing application/json
+app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 app.get("/userList", (req, res) => {
   // res.sendStatus(500);
@@ -25,16 +27,23 @@ app.get("/userList", (req, res) => {
   // }, 2000);
 });
 
-app.get("/goodsList", (req, res) => {
-  // res.sendStatus(500);
-  res.send({
-    code: 200,
-    data: goodsList().list
-  });
+app.post("/goodsList", (req, res) => {
+  if (req.body.test === "111111111") {
+    res.send({
+      code: 200,
+      data: goodsList().list
+    });
+  } else {
+    res.sendStatus(500);
+  }
 });
 
 app.get("/error", (req, res) => {
   res.sendStatus(500);
+  res.send({
+    code: 500,
+    data: null
+  });
 });
 
 app.get("/file/:name", (req, res) => {
